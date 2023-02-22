@@ -44,6 +44,8 @@ public class MemoryItemRepository implements ItemRepository {
         List<Item> collect = store.values().stream()
                 .filter(item -> {
                     if (ObjectUtils.isEmpty(itemName)) {
+                        // * ObjectUtils.isEmpty()는 전달값 자체가 null일 때도 true를 반환하지만,
+                        //   비어있는 '문자형'이 전달될 때에도 true를 반환 - length()로 체크
                         return true;
                     }
                     return item.getItemName().contains(itemName);
