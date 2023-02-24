@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
-
-@Import(MemoryConfig.class)
+@Import(JdbcTemplateV1Config.class)
+//@Import(MemoryConfig.class)
 // *** @Import 어노테이션
 // - @Configuration 어노테이션이 붙은 클래스간의 계층을 구성하거나 이어줄 때 사용
 // 1. @SpringBootApplication 어노테이션은 @Configuration 어노테이션을 포함하지만 ComponentScan에서 제외 대상이 아님
