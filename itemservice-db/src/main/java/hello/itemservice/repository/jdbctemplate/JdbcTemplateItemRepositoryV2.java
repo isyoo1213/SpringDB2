@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * NamedParameterJdbcTemplate -> Parameter Binding 객체 만들기
+ * NamedParameterJdbcTemplate -> key + values 형태의 Parameter Binding 객체로 바인딩하기
  *   - SqlParameterSource 인터페이스로 binding할 Parameter를 구현체를 통해 객체화
  *     구현체 방법 1. BeanPropertySqlParameterSource -> 객체에서 자동으로 parameter 추출하기
  *     구현체 방법 2. MapSqlParameterSource -> 객체에서 수동으로 parameter 추출하기
@@ -55,8 +55,9 @@ public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
 
         // 방법 1.
         // * BeanPropertySqlPamaterSource() + SqlParameterSource(여러 자료형으로 래핑 가능)
-        // -> Repository의 CRUD 메서드로 전달된 객체에서 Binding할 parameter 정보를 자동으로 추출 by 자바빈 프로퍼티 규약
-        // ex) getItemName() -> key -> itemName / value -> 상품명 값
+        //   -> Repository의 CRUD 메서드로 전달된 객체에서 Binding할 parameter 정보를 자동으로 추출 by 자바빈 프로퍼티 규약
+        //      ex) getItemName() -> key -> itemName / value -> 상품명 값
+        // * 현재 Item은 @Data를 활용하고있으므로 getter/setter를 인식해서 필드명들을 가져옴
         SqlParameterSource param = new BeanPropertySqlParameterSource(item);
 
         // 추출한 SqlParameterSource 자료형의 param을 전달해주기만 하면, sql에 매핑해줌
@@ -95,6 +96,7 @@ public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
                 .addValue("price", updateParam.getPrice())
                 .addValue("quantity", updateParam.getQuantity())
                 .addValue("id", itemId);
+        // *** "id"의 경우, ItemUpdateDto가 아닌 Item의 필드이므로, BeanPropertySqlParameterSource를 적용하지 못하는 경우에 해당
 
         template.update(sql, param);
 
@@ -117,6 +119,14 @@ public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
 
             // 방법 3. Map 사용 - JAVA 순수 문법
             Map<String, Object> param = Map.of("id", id);
+            // new HashMap<>()으로 직접 생성해 사용하는 것도 무방
+
+            // *** Map.of() / Map.ofEntries()
+            // JAVA 9이상부터 Map 자료구조를 초기화할 수 있음
+            // 주의점
+            // 1. Map.of()의 경우, parameter의 개수를 10개만큼 overloading하므로 이를 초과할 경우 오류 발생
+            // 2. of()/ofEntries() 모두 immutableCollections를 반환 -> 초기화 이후 put(), remove()등으로 수정 불가능
+
             Item item = template.queryForObject(sql, param, itemRowMapper());
 
             return Optional.of(item);
@@ -143,8 +153,13 @@ public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
     */
 
         // * BeanPropertyRowMapper
-        // rs, cursor등을 설정한 클래스에 맞게 모두 구성해줌
-        // + Camel case 변환 지원
+        //   - ResultSet의 결과를 받아서 자바빈 규약에 맞게 메서드 호출 및 데이터를 변환해줌
+        //   - rs, cursor등의 반복과 매핑을 설정한 클래스에 맞게 모두 구성해줌
+        // * Camel case 변환 지원
+        //   - DB에서 가져온 coulum과 Domain/DTO에서의 변수명이 다른 경우 -> 일반적으로 sql의 as 별칭을 사용해서 해결
+        //   * 관례의 불일치
+        //   - RDBMS는 주로 snake case를 사용하므로, 이를 자바의 camel case로 변환해주는 기능을 기본적으로 제공
+        // -> 즉, column 네임과 객체의 필드명이 완전히 다를 경우에만 sql as 별칭을 손봐주면 해결
         return BeanPropertyRowMapper.newInstance(Item.class);
     }
 
