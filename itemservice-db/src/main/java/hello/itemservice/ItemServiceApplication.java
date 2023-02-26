@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
-@Import(JdbcTemplateV2Config.class)
+@Import(JdbcTemplateV3Config.class)
+//@Import(JdbcTemplateV2Config.class)
 //@Import(JdbcTemplateV1Config.class)
 //@Import(MemoryConfig.class)
 // *** @Import 어노테이션
