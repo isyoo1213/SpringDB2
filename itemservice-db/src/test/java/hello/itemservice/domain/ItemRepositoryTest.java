@@ -9,8 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
@@ -23,6 +25,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 // - 이전까진 @SpringBootApplication가 붙은 어플리케이션 클래스에서 MemoryRepository를 @Import()하고 있었지만
 //   현재는 JdbcTemplateRepositoryV3를 @Import()하고 있으므로 V3 레포지토리를 주입받아 사용함
 
+@Transactional
+// *** Test 메서드나 클래스에 붙어있을 경우 로직 성공시 Commit이 아닌 Rollback 수행
+// - 메서드 단위의 Test에도 적용 가능
+// *** 트랜잭션 전파
+// - repository에서 사용하는 JdbcTemplate 등 con을 사용하는 곳 모두 트랜잭션을 시작한 동기화 매니저 내부의 con을 공유
+// - *** Service나 Repository 등에 적용된 @Transactional에서도 트랜잭션, con이 전파됨
+
+
 @SpringBootTest
 class ItemRepositoryTest {
     // *** 현재 Test에서는 repository의 구현체가 아닌 Interface 자료형으로 Test 진행
@@ -31,6 +41,7 @@ class ItemRepositoryTest {
     @Autowired
     ItemRepository itemRepository;
 
+/*
     // * Transaction 사용을 위한 의존성
     // + * Datasource와 transactionManager는 Spring이 자동으로 Bean 등록해줌
     @Autowired
@@ -46,6 +57,7 @@ class ItemRepositoryTest {
         // 굳이 commit하지 않아도 나의 session에서는 수행된 DB데이터들을 조회하는 것은 가능
         status = transactionManager.getTransaction(new DefaultTransactionDefinition());
     }
+*/
 
     @AfterEach
     void afterEach() {
@@ -59,9 +71,12 @@ class ItemRepositoryTest {
 
         //Transaction 롤백
         // * 현재 롤백 로그에는 JdbcTranscationManager를 설정했지만 실질적으로는 DatasourceTransactionManager를 상속
-        transactionManager.rollback(status);
+        //transactionManager.rollback(status);
     }
 
+    // *** 트랜잭션 내에서 Commiet()을 수행하고 싶을 경우
+    //@Commit
+    //@Rollback(value = false)
     @Test
     void save() {
         //given
