@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- <mapper> 태그 내의 namepace에 매핑 인터페이스의 경로를 지정해주어야 연동
+     + 추가적으로 xml 경로 설정 하는 방법도 알아보기 -->
+<mapper namespace="hello.itemservice.repository.mybatis.ItemMapper">
+
+    <!-- sql에 parameter를 바인딩하는 방식
+         - 매핑 인터페이스의 메서드에 넘겨주는 인자에서 추출해서 사용
+           ex) save(Item item) -> Item 클래스의 필드명을 #{필드명}으로 추출
+               -> 내부적으로 getItemName()을 통해 parameter로 추출
+     -->
+
+    <!-- insert의 경우 기존 JdbcTemplate의 KeyHolder의 generatedKey처리까지 지정만해주면 모두 알아서 처리해줌 -->
+    <!-- *** #{} 문법은 PreparedStatement를 사용 -> JDBC의 '?'에 해당 -->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into item (item_name, price, quantity)
+        values (#{itemName}, #{price}, #{quantity})
+    </insert>
+
+    <update id="update">
+        update item
+        set item_name=#{updateParam.itemName},
+            price=#{updatePram.price},
+            quantity=#{updateParam.quantity},
+        where id=#{id}
+    </update>
+
+    <!-- resultType - application.properties에서 세팅한 mybatis.type-aliases-package의 값을 자동으로 인식 -->
+    <select id="findById" resultType="Item">
+        select id, item_name, price, quantity
+        from item
+        where id=#{id} <!-- 매핑 인터페이스에서 전달되는 parameter가 1개인 경우에는 아무 이름으로 작성해도 인식 가능 -->
+    </select>
+
+    <select id="findAll" resultType="Item">
+        select id, item_name, price, quantity
+        from item
+        <where>
+            <if test="itemName != null and itemName != ''">
+                and item_name like concat('%', #{itemName}, '%')
+            </if>
+            <if test="maxPrice != null">
+                and price &lt;= #{maxPrice}
+            </if>
+        </where>
+    </select>
+</mapper>
