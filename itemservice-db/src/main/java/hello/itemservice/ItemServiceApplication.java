@@ -58,6 +58,7 @@ public class ItemServiceApplication {
 		return new TestDataInit(itemRepository);
 	}
 
+/*
 	// *** Embedded 모드 DB를 위한 DataSource Bean을 수동 등록
 	// - JVM 내에 h2 DB를 만들고 사용
 	// - Test 수행 시, DataSource에 자동으로 주입됨
@@ -74,5 +75,6 @@ public class ItemServiceApplication {
 		dataSource.setPassword("");
 		return dataSource;
 	}
+*/
 
 }
