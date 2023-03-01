@@ -31,8 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 // *** 트랜잭션 전파
 // - repository에서 사용하는 JdbcTemplate 등 con을 사용하는 곳 모두 트랜잭션을 시작한 동기화 매니저 내부의 con을 공유
 // - *** Service나 Repository 등에 적용된 @Transactional에서도 트랜잭션, con이 전파됨
-
-
 @SpringBootTest
 class ItemRepositoryTest {
     // *** 현재 Test에서는 repository의 구현체가 아닌 Interface 자료형으로 Test 진행
