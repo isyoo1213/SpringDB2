@@ -22,7 +22,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	//JdbcTemplate 추가
+	//JdbcTemplate 추가 - MyBatis/JPA 라이브러리 추가시 자동으로 등록되므로 주석처리해도 됨
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
 	//H2 데이터베이스 추가
@@ -31,6 +31,9 @@ dependencies {
 	//MyBatis 추가
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
 	// * 라이브러리 뒤에 버전정보가 붙는 것 - Spring이 공식적으로 버전관리를 하지 않는다는 의미
+
+	//JPA, Spring Data JPA 추가
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
