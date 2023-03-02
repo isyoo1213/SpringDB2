@@ -23,6 +23,14 @@ public class MyBatisItemRepository implements ItemRepository {
 
     @Override
     public Item save(Item item) {
+
+        //ItemMapper에 어떤 인스턴스가 주입되어있는지 확인하기 위한 로그
+        log.info("itemMapper class = {}", itemMapper.getClass());
+        //실제 로그
+        //h.i.r.mybatis.MyBatisItemRepository
+        //: itemMapper class = class com.sun.proxy.$Proxy66
+        // -> ItemMapper를 상속받은 객체를 인스턴스화
+
         itemMapper.save(item);
         return item;
     }
