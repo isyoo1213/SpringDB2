@@ -16,6 +16,19 @@ import java.util.Optional;
 
 @Slf4j
 @Repository
+// *** JPA 사용 시@Repository의 역할
+// - @Controller 어노테이션 : @Component + controller와 연관된 기능 보유
+// - @Service : 오로지 @Conponent의 기능
+// - @Repository : @Component + *** 예외 변환 AOP의 대상
+//   -> Spring과 함께 사용시 Spring이 JPA 예외변환기를 등록 * PersistenceExceptionTranslator
+//   -> JPA 관련 Exception 발생시 스프링 데이터 접근 예외로 변환
+// *** JPA와 @Repository에서 JPA 관련 예외 발생시 처리 과정
+//    1. SpringBoot는 @Repository 어노테이션을 통해 * 예외 변환 AOP Proxy를 만듦 - 내부적으로 여러 단계를 거침
+//    2. Repository는 JPA Exception인 PersistenceException을 예외 변환 AOP Proxy로 전달
+//    3. JPA는 기본적으로 @Repository, @Transactional에 Proxy를 생성해 내부로직 처리
+//    4. AOP Proxy는 Repository Proxy 객체를 통해 PersistenceException을 DataAccessException으로 변환
+//    5. 변환된 DataAccessException을 Service계층으로 전달 (Service는 스프링예외추상화에 의존)
+// -> 이 과정은 Test에서 로그를 통해 확인 가능
 @Transactional
 // *** JPA의 모든 데이터 변경(조회는 transaction없이 가능)은 Transaction 내에서 이루어짐
 // + *** 일반적으로는 비즈니스 로직이 시작되는 계층에서 transaction을 걸어주는 것이 맞음(주로 Service)
@@ -25,6 +38,12 @@ public class JpaItemRepository implements ItemRepository {
     //    - Spring과 통합된 환경이므로 관련 설정을 모두 잡아줌
     //    - 그렇지 않을 경우 EntityManagerFactory, JpaTransactionManager, DataSource 설정 등을 해주어야함
     // * SpringBoot의 자동설정은 JpaBaseConfiguration을 참고
+
+    // *** EntityManager는 순수한 JPA 기술 - 스프링과 관련이 없다
+    //    - 오류발생시 PersistenceException과 그 하위 예외인 JPA 예외를 발생시킴
+    //    - 추가로 IllegalStateException / IllegalArgumentException도 가능
+    // *** EntityManager에서 발생한 예외를 Repository계층에서 핸들링하지 못하면 Service계층이 해당 Exception에 종속적이게 된다
+    //    -> 즉, JPA 예외를 기존의 Spring이 처리할 수 있는 스프링 예외 추상화 DataAccessException으로 변환할 수 있어야함
     private final EntityManager em;
 
     public JpaItemRepository(EntityManager em) {

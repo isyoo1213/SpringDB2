@@ -4,6 +4,7 @@ import hello.itemservice.repository.ItemRepository;
 import hello.itemservice.repository.ItemSearchCond;
 import hello.itemservice.repository.ItemUpdateDto;
 import hello.itemservice.repository.memory.MemoryItemRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 // - 이전까진 @SpringBootApplication가 붙은 어플리케이션 클래스에서 MemoryRepository를 @Import()하고 있었지만
 //   현재는 JdbcTemplateRepositoryV3를 @Import()하고 있으므로 V3 레포지토리를 주입받아 사용함
 
+@Slf4j
 @Transactional
 // *** Test 메서드나 클래스에 붙어있을 경우 로직 성공시 Commit이 아닌 Rollback 수행
 // - 메서드 단위의 Test에도 적용 가능
@@ -72,7 +74,7 @@ class ItemRepositoryTest {
         //transactionManager.rollback(status);
     }
 
-    // *** 트랜잭션 내에서 Commiet()을 수행하고 싶을 경우
+    // *** 트랜잭션 내에서 Commit()을 수행하고 싶을 경우
     //@Commit
     //@Rollback(value = false)
     @Test
@@ -110,6 +112,12 @@ class ItemRepositoryTest {
 
     @Test
     void findItems() {
+        //JPA 활용 시, @Repository 어노테이션을 사용 시 repository의 Proxy가 생성되는지 확인하는 로그
+        // * @Transactional 또한 Proxy를 생성하므로 주석처리해야 정확하게 파악 가능
+        log.info("Repository = {}", itemRepository.getClass());
+        //실제 로그
+        //Repository = class hello.itemservice.repository.jpa.JpaItemRepository$$EnhancerBySpringCGLIB$$d0843546
+
         //given
         Item item1 = new Item("itemA-1", 10000, 10);
         Item item2 = new Item("itemA-2", 20000, 20);
