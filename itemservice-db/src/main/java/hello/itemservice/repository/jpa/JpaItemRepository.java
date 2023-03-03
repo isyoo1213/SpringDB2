@@ -34,6 +34,10 @@ public class JpaItemRepository implements ItemRepository {
     @Override
     public Item save(Item item) {
         em.persist(item);
+        // JPA가 만들어서 실행한 SQL
+        // insert into item (id, item_name, price, quantity) values (default, ?, ?, ?)
+        // - strategy에 따라 PK에 null, default, 아무것도 넣지 않을 수도 있다
+        // - * 쿼리 실행 이후 Item객체의 id필드에 DB가 생성한 PK값을 넣어줌
         return item;
     }
 
@@ -44,8 +48,11 @@ public class JpaItemRepository implements ItemRepository {
         findItem.setPrice(updateParam.getPrice());
         findItem.setQuantity(updateParam.getQuantity());
         // *** update() 관련 로직을 수행하지 않음
-        // - Transaction이 Commit되는 시점에 update 쿼리를 만들어서 DB에 전송
-        //   -> Test에서는 Rollback이 수행되도록 설정됐으므로 로그에 찍히지 않을수도
+        //     - Transaction이 Commit되는 시점에 변경된 entity 객체가 있는지 확인
+        // *** JPA는 Entity 원본 객체를 스냅샷으로 복제해서 가지고 있음
+        //     -> 이후 쿼리 실행 후의 객체와 스냅샷을 비교 by *** 영속성 컨텍스트
+        //     -> 변경점이 있다면 update 쿼리를 만들어서 DB에 전송
+        // - Test에서는 Rollback이 수행되도록 설정됐으므로 로그에 찍히지 않을수도 -> Test에 @Commit으로 일시적으로 확인 or flush()
     }
 
     @Override
