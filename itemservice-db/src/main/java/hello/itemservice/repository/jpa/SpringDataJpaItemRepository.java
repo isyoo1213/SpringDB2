@@ -7,6 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+// *** 이러한 Interface의 구현은 스프링이 Proxy를 통해 만든 구현 클래스의 인스턴스를 Bean 등록한다
+
 // *** SDJ는 Interface를 기반으로 작성한다
 public interface SpringDataJpaItemRepository extends JpaRepository<Item, Long> {
     // 1st : 관리할 Entity

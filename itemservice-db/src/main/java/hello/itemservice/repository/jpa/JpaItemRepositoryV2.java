@@ -39,7 +39,8 @@ import java.util.Optional;
 public class JpaItemRepositoryV2 implements ItemRepository {
 
     private final SpringDataJpaItemRepository repository; // @RequiredArgsConstructor로 바로 주입되도록 만듦
-
+    // *** SpringDataJpaItemRepository는 인터페이스이지만 Spring에서 Proxy를 통해 구현클래스를 생성하고 인스턴스를 Bean 등록한다
+    //     -> Spring 내부적인 동작들로 은닉되어 interface의 의존성 주입을 간단히 생각하고 넘길 수 있으나, 항상 실제 주입되는 인스턴스를 염두하자
 
     @Override
     public Item save(Item item) {
