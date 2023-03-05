@@ -8,6 +8,11 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+//SDJ Test 디버그를 위한 hibernate 버전 컨트롤 (findAllxxx()의 sql에 바인딩되는 parameter의 오류)
+ext["hibernate.version"] = "5.6.5.Final"
+ext["hibernate.version"] = "5.6.5.Final"
+
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
