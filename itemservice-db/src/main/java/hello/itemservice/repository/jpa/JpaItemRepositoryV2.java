@@ -30,6 +30,10 @@ import java.util.Optional;
 
 @Slf4j
 @Repository
+// * SDJ에서의 예외변환
+//  - *** SDJ는 Persistence가 아닌 Springframework의 하위 기술이므로 모두 Spring 내에서 처리 가능
+//  - *** JPA에서 @Repository 어노테이션이 제공하는 예외변환 AOP Proxy가 필수적이지 않음
+//  - 만약, spring에서 넘어온 예외변환된 예외가 @Repository의 AOP로 넘어와도 이미 변환된 예외이므로 무시하고 넘어감
 @Transactional
 @RequiredArgsConstructor
 public class JpaItemRepositoryV2 implements ItemRepository {
