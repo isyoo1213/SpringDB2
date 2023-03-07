@@ -12,7 +12,8 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
-@Import(SpringDataJpaConfig.class)
+@Import(QuerydslConfig.class)
+//@Import(SpringDataJpaConfig.class)
 //@Import(JpaConfig.class)
 //@Import(MyBatisConfig.class)
 //@Import(JdbcTemplateV3Config.class)
